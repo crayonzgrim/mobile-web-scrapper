@@ -11,14 +11,16 @@ export const SingleLineInput = ({ value, onChangeText, placeholder }: SingleLine
   const [focused, setFocused] = useState(false);
 
   return (
-    <View style={{
-      alignSelf: 'stretch',
-      paddingHorizontal: 12,
-      paddingVertical: 8,
-      borderRadius: 4,
-      borderWidth: 1,
-      borderColor: focused ? 'black' : 'gray'
-    }}>
+    <View
+      style={{
+        alignSelf: 'stretch',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 4,
+        borderWidth: 1,
+        borderColor: focused ? 'black' : 'gray'
+      }}
+    >
       <TextInput
         autoCorrect={false}
         value={value}
@@ -26,9 +28,7 @@ export const SingleLineInput = ({ value, onChangeText, placeholder }: SingleLine
         placeholder={placeholder}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-
       />
-
     </View>
   )
 };

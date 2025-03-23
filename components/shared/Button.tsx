@@ -10,7 +10,7 @@ type HitSlop = {
 type ButtonProps = {
   onPressIn?: () => void;
   onPressOut?: () => void;
-  onPress?: () => void;
+  onPress?: (item?: any) => void;
   hitSlop?: HitSlop;
   children: React.ReactNode;
   paddingHorizontal?: number;

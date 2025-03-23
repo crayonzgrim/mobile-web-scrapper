@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
-import { LinkListScreen } from "./LinkListScreen"
+import LinkListScreen from "./LinkListScreen"
 
 const Stack = createNativeStackNavigator()
 

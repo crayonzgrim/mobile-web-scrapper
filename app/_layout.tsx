@@ -1,34 +1,40 @@
+import { RecoilPersist } from "@/hooks/useRecoilPersist";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { RecoilRoot } from "recoil";
 import MainLayout from "./(main)/_layout";
-import { AddLinkScreen } from "./(main)/AddLinkScreen";
-import { LinkDetailScreen } from "./(main)/LinkDetailScreen";
+import AddLinkScreen from "./(main)/AddLinkScreen";
+import LinkDetailScreen from "./(main)/LinkDetailScreen";
 
 const Stack = createNativeStackNavigator()
 
 export default function RootLayout() {
   return (
-    <SafeAreaProvider style={{ flex: 1 }}>
-      <Stack.Navigator
-        initialRouteName="(main)"
-        screenOptions={{
-          presentation: "containedModal",
-          headerShown: false
-        }}
-      >
-        <Stack.Screen name="(main)" component={MainLayout} />
-        <Stack.Screen
-          name="AddLink"
-          component={AddLinkScreen}
-          options={{ presentation: "containedModal" }}
-        />
-        <Stack.Screen
-          name="LinkDetail"
-          component={LinkDetailScreen}
-          options={{ presentation: "card" }}
-        />
-      </Stack.Navigator>
-    </SafeAreaProvider>
+    <RecoilRoot>
+      <SafeAreaProvider style={{ flex: 1 }}>
+        <RecoilPersist>
+          <Stack.Navigator
+            initialRouteName="(main)"
+            screenOptions={{
+              presentation: "containedModal",
+              headerShown: false
+            }}
+          >
+            <Stack.Screen name="(main)" component={MainLayout} />
+            <Stack.Screen
+              name="AddLink"
+              component={AddLinkScreen}
+              options={{ presentation: "containedModal" }}
+            />
+            <Stack.Screen
+              name="LinkDetail"
+              component={LinkDetailScreen}
+              options={{ presentation: "card" }}
+            />
+          </Stack.Navigator>
+        </RecoilPersist>
+      </SafeAreaProvider>
+    </RecoilRoot>
   )
 }
 
