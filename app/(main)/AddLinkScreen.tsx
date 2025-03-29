@@ -1,16 +1,20 @@
 import { Button } from '@/components/shared/Button';
 import { Header } from '@/components/shared/Header/Header';
+import { RemoteImage } from '@/components/shared/RemoteImage';
 import { SingleLineInput } from '@/components/shared/SingleLineInput';
 import { Spacer } from '@/components/shared/Spacer';
 import { Typography } from '@/components/shared/Typography';
 import { atomLinkList, LinkListState } from '@/store/atomLinkList';
+import { getOpenGraphData } from '@/utils/openGraphTagUtils';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSetRecoilState } from 'recoil';
 
 export default function AddLinkScreen() {
+  const { width } = useWindowDimensions();
+
   const navigation = useNavigation();
 
   const safeareaInset = useSafeAreaInsets();
@@ -18,6 +22,7 @@ export default function AddLinkScreen() {
   const updateList = useSetRecoilState<LinkListState>(atomLinkList);
 
   const [url, setUrl] = useState('')
+  const [metaData, setMetaData] = useState<any>(null)
 
   const onPressBack = () => {
     navigation.goBack();
@@ -42,6 +47,13 @@ export default function AddLinkScreen() {
     setUrl("")
   }
 
+
+  const onSubmitEditing = async () => {
+    const result = await getOpenGraphData(url);
+    setMetaData(result)
+  }
+
+
   return (
     <View style={{ flex: 1 }}>
       <Header>
@@ -57,8 +69,27 @@ export default function AddLinkScreen() {
           value={url}
           onChangeText={setUrl}
           placeholder="https://example.com"
+          onSubmitEditing={onSubmitEditing}
         />
+
+        {
+          metaData && (
+            <>
+              <Spacer space={20} />
+
+              <View style={{ borderWidth: 1, borderRadius: 4, borderColor: 'gray' }}>
+                <RemoteImage uri={metaData.image} width={width - 48} height={(width - 48) * 0.5} />
+                <Spacer space={10} />
+                <Typography color="black" fontSize={20}>{metaData.title}</Typography>
+                <Spacer space={4} />
+                <Typography color="gray" fontSize={16}>{metaData.description}</Typography>
+              </View>
+            </>
+          )
+        }
+
       </View>
+
 
       <Button onPress={onPressSave}>
         <View style={{ backgroundColor: url === "" ? 'gray' : "black" }}>

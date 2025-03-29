@@ -5,9 +5,10 @@ type SingleLineInputProps = {
   value: string;
   onChangeText: (text: string) => void;
   placeholder: string;
+  onSubmitEditing: () => void;
 }
 
-export const SingleLineInput = ({ value, onChangeText, placeholder }: SingleLineInputProps) => {
+export const SingleLineInput = ({ value, onChangeText, placeholder, onSubmitEditing }: SingleLineInputProps) => {
   const [focused, setFocused] = useState(false);
 
   return (
@@ -28,6 +29,7 @@ export const SingleLineInput = ({ value, onChangeText, placeholder }: SingleLine
         placeholder={placeholder}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
+        onSubmitEditing={onSubmitEditing}
       />
     </View>
   )

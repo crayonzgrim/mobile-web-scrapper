@@ -13,8 +13,6 @@ export default function LinkDetailScreen() {
     navigation.goBack();
   }
 
-  console.log({ uri: (routes?.params as any)?.link })
-  // Https://naver.com
   return (
     <View style={{ flex: 1 }}>
       <Header>
