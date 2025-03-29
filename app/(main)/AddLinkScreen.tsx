@@ -5,9 +5,10 @@ import { SingleLineInput } from '@/components/shared/SingleLineInput';
 import { Spacer } from '@/components/shared/Spacer';
 import { Typography } from '@/components/shared/Typography';
 import { atomLinkList, LinkListState } from '@/store/atomLinkList';
+import { getClipboardString } from '@/utils/clipboardUtils';
 import { getOpenGraphData } from '@/utils/openGraphTagUtils';
 import { useNavigation } from '@react-navigation/native';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSetRecoilState } from 'recoil';
@@ -33,8 +34,8 @@ export default function AddLinkScreen() {
 
     updateList((prev) => {
       const list = [{
-        title: "",
-        image: "",
+        title: metaData?.title ?? "",
+        image: metaData?.image ?? "",
         link: url,
         createdAt: new Date().toISOString()
       }]
@@ -48,10 +49,29 @@ export default function AddLinkScreen() {
   }
 
 
+
   const onSubmitEditing = async () => {
     const result = await getOpenGraphData(url);
     setMetaData(result)
   }
+
+  const onGetClipboardString = useCallback(async () => {
+    const result = await getClipboardString();
+    if (result.startsWith("http")) {
+      setUrl(result)
+      const ogResult = await getOpenGraphData(result);
+      setMetaData({
+        title: ogResult.title,
+        image: ogResult.image,
+        description: ogResult.description,
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    // https://github.com
+    onGetClipboardString()
+  }, [])
 
 
   return (
