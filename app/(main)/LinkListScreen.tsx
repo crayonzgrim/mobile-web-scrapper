@@ -8,7 +8,8 @@ import { atomLinkList } from '@/store/atomLinkList';
 import { RootStackParamList } from '@/types/navigation';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { FlatList, Text, View } from 'react-native';
+import { useMemo } from 'react';
+import { FlatList, SectionList, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRecoilValue } from 'recoil';
 
@@ -27,6 +28,33 @@ export default function LinkListScreen() {
     navigate("AddLink")
   }
 
+  const sectionData = useMemo(() => {
+    const dateList: any = {};
+
+    const makeDateString = (createdAt: string) => {
+      const dateItem = new Date(createdAt)
+      return `${dateItem.getFullYear()}.${dateItem.getMonth() + 1}.${dateItem.getDate()} ${dateItem.getHours()}:${dateItem.getMinutes()}`
+    }
+
+    if (!data.list) return []
+
+    data.list.forEach(item => {
+      const keyName = makeDateString(item.createdAt)
+      if (!dateList[keyName]) {
+        dateList[keyName] = [item];
+      } else {
+        dateList[keyName].push(item);
+      }
+    })
+
+    return Object.keys(dateList).map(item => {
+      return {
+        title: item,
+        data: dateList[item]
+      }
+    })
+  }, [])
+
   return (
     <View style={{ flex: 1 }}>
       <Header>
@@ -34,6 +62,37 @@ export default function LinkListScreen() {
           <Header.Title title="Link List" />
         </Header.Group>
       </Header>
+
+      <SectionList
+        style={{ flex: 1 }}
+        sections={sectionData}
+        renderItem={({ item }) => {
+          return (
+            <Button onPress={() => onPressListItem(item)} paddingHorizontal={24} paddingVertical={24}>
+              <View>
+                <Typography fontSize={20}>
+                  {item?.link}
+                </Typography>
+
+                <Spacer space={4} />
+
+                <Typography fontSize={16} color="gray">
+                  {item?.title !== '' ? `${item?.title.slice(0, 20)} | ` : ''}{new Date(item?.createdAt).toLocaleString()}
+                </Typography>
+              </View>
+            </Button>
+          )
+        }}
+        renderSectionHeader={({ section }) => {
+          return (
+            <View style={{ paddingHorizontal: 12, paddingVertical: 4, backgroundColor: "#FFF" }}>
+              <Typography fontSize={16} color="gray">
+                {section.title}
+              </Typography>
+            </View>
+          )
+        }}
+      />
 
       <FlatList
         style={{ flex: 1 }}
@@ -55,7 +114,6 @@ export default function LinkListScreen() {
             </Button>
           )
         }}
-
       />
 
       <View style={{ position: 'absolute', right: 24, bottom: 24 + safeAreaInset.bottom }}>

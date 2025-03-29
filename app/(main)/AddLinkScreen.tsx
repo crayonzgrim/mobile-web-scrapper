@@ -1,5 +1,6 @@
 import { Button } from '@/components/shared/Button';
 import { Header } from '@/components/shared/Header/Header';
+import { Icon } from '@/components/shared/Icon';
 import { RemoteImage } from '@/components/shared/RemoteImage';
 import { SingleLineInput } from '@/components/shared/SingleLineInput';
 import { Spacer } from '@/components/shared/Spacer';
@@ -9,7 +10,7 @@ import { getClipboardString } from '@/utils/clipboardUtils';
 import { getOpenGraphData } from '@/utils/openGraphTagUtils';
 import { useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSetRecoilState } from 'recoil';
 
@@ -24,6 +25,7 @@ export default function AddLinkScreen() {
 
   const [url, setUrl] = useState('')
   const [metaData, setMetaData] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
 
   const onPressBack = () => {
     navigation.goBack();
@@ -51,8 +53,12 @@ export default function AddLinkScreen() {
 
 
   const onSubmitEditing = async () => {
+    setLoading(true)
+
     const result = await getOpenGraphData(url);
     setMetaData(result)
+
+    setLoading(false)
   }
 
   const onGetClipboardString = useCallback(async () => {
@@ -84,29 +90,56 @@ export default function AddLinkScreen() {
         <Header.Icon name='close' onPress={onPressBack} />
       </Header>
 
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 }}>
-        <SingleLineInput
-          value={url}
-          onChangeText={setUrl}
-          placeholder="https://example.com"
-          onSubmitEditing={onSubmitEditing}
-        />
+      <View style={{ flex: 1, justifyContent: 'flex-start', paddingTop: 32, paddingHorizontal: 24 }}>
+        <View>
+          <SingleLineInput
+            value={url}
+            onChangeText={setUrl}
+            placeholder="https://example.com"
+            onSubmitEditing={onSubmitEditing}
+          />
 
+          <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, borderWidth: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <Button onPress={() => {
+              setUrl("")
+              setMetaData(null)
+            }}>
+              <Icon name="close" size={16} color={'black'} />
+            </Button>
+          </View>
+        </View>
         {
-          metaData && (
+          loading ? (
             <>
               <Spacer space={20} />
 
               <View style={{ borderWidth: 1, borderRadius: 4, borderColor: 'gray' }}>
-                <RemoteImage uri={metaData.image} width={width - 48} height={(width - 48) * 0.5} />
-                <Spacer space={10} />
-                <Typography color="black" fontSize={20}>{metaData.title}</Typography>
-                <Spacer space={4} />
-                <Typography color="gray" fontSize={16}>{metaData.description}</Typography>
+                <Spacer space={(width - 48) * 0.5} />
+                <Spacer space={50} />
+
+                <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}>
+                  <ActivityIndicator size="large" />
+                </View>
+
               </View>
             </>
+          ) : (
+            metaData && (
+              <>
+                <Spacer space={20} />
+
+                <View style={{ borderWidth: 1, borderRadius: 4, borderColor: 'gray' }}>
+                  <RemoteImage uri={metaData.image} width={width - 48} height={(width - 48) * 0.5} />
+                  <Spacer space={10} />
+                  <Typography color="black" fontSize={20}>{metaData.title}</Typography>
+                  <Spacer space={4} />
+                  <Typography color="gray" fontSize={16}>{metaData.description}</Typography>
+                </View>
+              </>
+            )
           )
         }
+
 
       </View>
 
